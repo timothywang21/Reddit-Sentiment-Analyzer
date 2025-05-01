@@ -1,0 +1,14 @@
+Old versions/
+__pycache__/
+.vs 
+.vscode
+venv/
+threads/
+
+# Only track the requirements.txt file, all other .txt files are ignored
+!requirements.txt
+*.txt
+
+# Don't track the .ini files 
+*.ini
+
