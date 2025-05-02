@@ -1,9 +1,12 @@
 import os
-from typing import Tuple
+import sys
+import configparser
 from reddit2text import Reddit2Text
 import llm_analyzer
-import configparser 
+from typing import Tuple
 
+# global debug variable to control debug messages
+DEBUG = False  # Set this to False to disable debug prints
 def clear_terminal():
     '''Function that clears terminal every time this script is run'''
     if os.name == 'nt':
@@ -26,27 +29,29 @@ def print_fancy_welcome():
     print(f"{BOLD}{RED}║ {YELLOW}✨ {CYAN}Reddit Sentiment Program {BLUE}[Powered by Reddit2Text]{YELLOW}✨{RED} ║")
     print(f"{BOLD}{RED}╚═{'═' * 55}╝{RESET}\n")      
 def get_reddit_config():
+    
     config = configparser.ConfigParser()
     
     # Get the directory of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # print(f"Script directory/folder: {script_dir}")
-    print(f"Current working directory: {os.getcwd()}")
+    if DEBUG:
+        print(f"Current working directory: {os.getcwd()}")
     
     # Construct the full path to config.ini
     config_path = os.path.join(script_dir, 'config.ini')
 
-    print(f"Attempting to read config from: {config_path}")
+    if DEBUG:
+        print(f"Attempting to read config from: {config_path}")
     
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"config.ini file not found at {config_path}")
     
     # Actual config read() action!!!
-    config.read(config_path) #reading the actual config.ini file
+    config.read(config_path)  # reading the actual config.ini file
     
     # Check if the config file is read and outputs the sections within the file
-    print(f"Successfully read config file from: {config_path}")
-    # print(f"Sections in config file: {config.sections()}")  # debug print statement
+    if DEBUG:
+        print(f"Successfully read config file from: {config_path}")
     
     if 'REDDIT' not in config:
         raise KeyError("'REDDIT' section not found in config file")
@@ -127,7 +132,7 @@ def save_all_content(url: str, file_path: str, analysis: str, reddit_content: st
 
     # Return the Reddit content for further use if needed
     return reddit_content
-def print_llm_analysis(analysis) -> (str):
+def print_llm_analysis(analysis) -> str:
     """Prints the LLM output into a nice and fancy format."""
     # ANSI escape codes for colors and styles
     CYAN = '\033[96m'
@@ -148,9 +153,7 @@ def print_llm_analysis(analysis) -> (str):
     lines = text_content.split('\n')
 
     # Print fancy header
-    print(f"\n{BOLD}{BLUE}{'=' * 50}{RESET}")
-    print(f"{BOLD}{CYAN}🤖 Analysis Results 🤖{RESET}".center(60))
-    print(f"{BOLD}{BLUE}{'=' * 50}{RESET}\n")
+    print(f"\n{BOLD}{BLUE}{'=' * 25} 🤖 Analysis Results 🤖 {'=' * 25}{RESET}\n")
 
     # Print sentiment rating (assuming it's the first line)
     if lines:
@@ -177,13 +180,10 @@ def print_llm_analysis(analysis) -> (str):
         print(f"{WHITE}{line.strip()}{RESET}")
 
     # Print fancy footer
-    print(f"\n{BOLD}{BLUE}{'=' * 50}{RESET}")
-    print(f"{BOLD}{CYAN}End of Analysis{RESET}".center(60))
-    print(f"{BOLD}{BLUE}{'=' * 50}{RESET}\n")
+    print(f"\n{BOLD}{BLUE}{'=' * 25} End of Analysis {'=' * 25}{RESET}\n")
     
     return text_content #returns the analyzed text. 
 def main():
-    import sys
     try:
         # Clear terminal and print welcome message
         clear_terminal()
